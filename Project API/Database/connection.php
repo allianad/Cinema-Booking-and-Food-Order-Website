@@ -1,0 +1,22 @@
+<?php
+
+function getConnection(){
+
+	$dsn = "mysql:host=127.0.0.1;dbname=cpsc471_project;";
+	
+	try {
+		$pdo = new PDO($dsn, "alliana", "ensf409");
+		$pdo->exec("set names utf8");
+		
+		if ($pdo) {
+			
+		}
+		
+	} catch (PDOException $e) {
+		echo "Database could not be connected";
+	}
+
+	return $pdo;
+}
+	
+?>
