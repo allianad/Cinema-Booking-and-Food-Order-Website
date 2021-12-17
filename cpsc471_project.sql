@@ -1,29 +1,18 @@
--- phpMyAdmin SQL Dump
--- version 4.9.1
--- https://www.phpmyadmin.net/
---
--- Host: localhost
--- Generation Time: Dec 14, 2021 at 04:54 AM
--- Server version: 8.0.17
--- PHP Version: 7.3.10
+-- schema name: cpsc471_project.sql
+-- version: 5
+-- date: 11 DEC 2021
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
+
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
--- Database: `cpsc471_project`
---
+/* Database: `cpsc471_project` */
+
 DROP DATABASE IF EXISTS CPSC471_PROJECT;
 CREATE DATABASE CPSC471_PROJECT;
 USE CPSC471_PROJECT;
+
+/* STORED PROCEDURES */
 
 DROP PROCEDURE IF EXISTS addCustomerAccount;
 DROP PROCEDURE IF EXISTS cancelBookingSeats;
@@ -51,28 +40,75 @@ DROP PROCEDURE IF EXISTS getMovieShowingSeats;
 DROP PROCEDURE IF EXISTS getOrderNumber;
 DROP PROCEDURE IF EXISTS updateBookingCost;
 DROP PROCEDURE IF EXISTS updateCostNofSeatsBooking;
-
-DROP PROCEDURE IF EXISTS addEmployeeAccount;
-DROP PROCEDURE IF EXISTS checkManagerSSN;
-DROP PROCEDURE IF EXISTS getEmployeeInfo;
 DROP PROCEDURE IF EXISTS getEmployeeSSN;
-DROP PROCEDURE IF EXISTS getManagerAndEmployeeInfo;
-DROP PROCEDURE IF EXISTS getFoodItemsbyOrderNo;
-DROP PROCEDURE IF EXISTS getFoodOrders;
-DROP PROCEDURE IF EXISTS getSeatIDs;
-DROP PROCEDURE IF EXISTS updateDeliverStatus;
 
+-- used in manager
 DROP PROCEDURE IF EXISTS addSeatsForShowing;
+DROP PROCEDURE IF EXISTS addMovie;
+DROP PROCEDURE IF EXISTS removeMovie;
+DROP PROCEDURE IF EXISTS getAllMovie;
+DROP PROCEDURE IF EXISTS getTheatreRooms;
+DROP PROCEDURE IF EXISTS getAllShowings;
+DROP PROCEDURE IF EXISTS getShowingsInRoom;
+DROP PROCEDURE IF EXISTS getMovieLength;
+DROP PROCEDURE IF EXISTS addMovieShowing;
+DROP PROCEDURE IF EXISTS removeMovieShowing;
+DROP PROCEDURE IF EXISTS getTheatreLocation;
+DROP PROCEDURE IF EXISTS getEmployeeInfo;
 
 DELIMITER $$
 --
 -- Procedures
 --
-
--- Procedures for Customer Login and Customer Pages
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addCustomerAccount` (IN `cfirstname` VARCHAR(20), IN `clastname` VARCHAR(20), IN `cemail` VARCHAR(20), IN `cpassword` VARCHAR(20))  NO SQL
 BEGIN
 INSERT INTO Customer (FirstName, LastName, Email, Password) VALUES (cfirstname, clastname, cemail, cpassword);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addMovie` (IN `mname`VARCHAR(25), IN `mgenre` VARCHAR(25), IN `mduration` INT) NO SQL
+BEGIN
+INSERT INTO Movie(Name, Genre, Duration) VALUES (mname, mgenre, mduration);
+END $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addMovieShowing` (IN `dt`VARCHAR(25), IN `rm` VARCHAR(25), IN `mid` INT) NO SQL
+BEGIN
+INSERT INTO movie_showing VALUES (dt, rm, mid);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addSeatsForShowing` (IN `dt` DATETIME, IN `roomNo` INT)  NO SQL
+BEGIN
+INSERT INTO seat (SeatID, Seat_Type, Room_No, CustomerID, DateTime) VALUES
+('A01', 'Wheelchair', roomNo, NULL, dt),
+('A02', 'Wheelchair', roomNo, NULL, dt),
+('A03', 'Normal', roomNo, NULL, dt),
+('A04', 'Normal', roomNo, NULL, dt),
+('A05', 'Normal', roomNo, NULL, dt),
+('B01', 'Wheelchair', roomNo, NULL, dt),
+('B02', 'Wheelchair', roomNo, NULL, dt),
+('B03', 'Normal', roomNo, NULL, dt),
+('B04', 'Normal', roomNo, NULL, dt),
+('B05', 'Normal', roomNo, NULL, dt),
+('C01', 'Normal', roomNo, NULL, dt),
+('C02', 'Normal', roomNo, NULL, dt),
+('C03', 'Normal', roomNo, NULL, dt),
+('C04', 'Normal', roomNo, NULL, dt),
+('C05', 'Normal', roomNo, NULL, dt),
+('D01', 'Normal', roomNo, NULL, dt),
+('D02', 'Normal', roomNo, NULL, dt),
+('D03', 'Normal', roomNo, NULL, dt),
+('D04', 'Normal', roomNo, NULL, dt),
+('D05', 'Normal', roomNo, NULL, dt),
+('E01', 'Normal', roomNo, NULL, dt),
+('E02', 'Normal', roomNo, NULL, dt),
+('E03', 'Normal', roomNo, NULL, dt),
+('E04', 'Normal', roomNo, NULL, dt),
+('E05', 'Normal', roomNo, NULL, dt),
+('F01', 'Normal', roomNo, NULL, dt),
+('F02', 'Normal', roomNo, NULL, dt),
+('F03', 'Normal', roomNo, NULL, dt),
+('F04', 'Normal', roomNo, NULL, dt),
+('F05', 'Normal', roomNo, NULL, dt);
+
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `cancelBookingSeats` (IN `customerID` INT(11), IN `roomNo` INT(11), IN `dateTime` DATETIME(6))  NO SQL
@@ -125,6 +161,19 @@ BEGIN
 SELECT contains_food_order.Quantity, Food.Price  FROM contains_food_order, Food WHERE contains_food_order.Order_Number = orderNumber AND contains_food_order.CustomerID = customerID AND contains_food_order.FoodID = Food.FoodID;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllMovie` () NO SQL 
+BEGIN
+SELECT * FROM movie;
+END $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllShowings` (IN `id` INT) NO SQL
+BEGIN
+SELECT m.Name "Name", ms.RoomNo "RoomNo", ms.DateTime "DateTime" 
+FROM movie_showing as ms, movie as m, theatre_room as t
+WHERE t.Room_No = ms.RoomNo and  m.MovieID = ms.MovieID and t.TheatreID = id
+ORDER BY DateTime;
+END $$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAvailableMovieShowings` (IN `dateTime` DATETIME(6))  NO SQL
 BEGIN
 SELECT Cinema_Theatre.Location, Movie_Showing.RoomNo, Movie_Showing.DateTime, Movie.Name, Movie.Genre, Movie.Duration FROM Movie_Showing, Movie, Theatre_Room, Cinema_Theatre WHERE DATE(Movie_Showing.DateTime) > dateTime AND Movie_Showing.MovieID = Movie.MovieID AND Movie_Showing.RoomNo = Theatre_Room.Room_No AND Theatre_Room.TheatreID = Cinema_Theatre.TheatreID;
@@ -150,9 +199,19 @@ BEGIN
 SELECT contains_food_order.FoodID, contains_food_order.Quantity FROM food_order, contains_food_order WHERE food_order.CustomerID = customerID AND food_order.MovieID = movieID AND food_order.DateTime = dateTime AND food_order.Order_Number = contains_food_order.Order_Number AND food_order.CustomerID = contains_food_order.CustomerID;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getCustomerInfo` (IN `email` VARCHAR(20), IN `password` VARCHAR(20))  NO SQL
+BEGIN
+SELECT * FROM Customer WHERE customer.Email = email AND customer.Password = password;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getCustomerSeat` (IN `roomNo` INT(11), IN `customerID` INT(11), IN `dateTime` DATETIME(6))  NO SQL
 BEGIN
 SELECT Seat.SeatID, Seat.Seat_Type FROM Seat WHERE Seat.Room_No = roomNo AND Seat.CustomerID = customerID AND Seat.DateTime = dateTime;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getEmployeeInfo` (IN `email` VARCHAR(25), IN `pass` VARCHAR(25)) NO SQL
+BEGIN
+SELECT * FROM Employee WHERE Email_Address = email AND Password = pass;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getFoodByID` (IN `food` INT(11))  NO SQL
@@ -175,6 +234,11 @@ BEGIN
 SELECT movie_showing.MovieID FROM movie_showing WHERE movie_showing.DateTime = dateTime AND movie_showing.RoomNo = roomNo;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getMovieLength` (IN `id` INT) NO SQL 
+BEGIN
+SELECT Duration FROM movie WHERE MovieID = id;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getMovieShowingFood` (IN `dateTime` DATETIME(6), IN `customerID` INT(11))  NO SQL
 BEGIN
 SELECT Movie.Name, Booking.DateTime, Booking.Room_No FROM Movie, Booking WHERE DATE(Booking.DateTime) > dateTime AND Booking.CustomerID = customerID AND Booking.MovieID = Movie.MovieID;
@@ -182,12 +246,40 @@ END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getMovieShowingSeats` (IN `roomNo` INT(11), IN `dateTime` DATETIME(6))  NO SQL
 BEGIN
-SELECT Seat.SeatID, Seat.Seat_Type FROM Seat, Movie_Showing WHERE Movie_Showing.RoomNo = roomNo AND Seat.DateTime = dateTime AND Movie_Showing.RoomNo = Seat.Room_No AND Seat.CustomerID IS NULL AND Movie_Showing.DateTime = dateTime;
+SELECT Seat.SeatID, Seat.Seat_Type FROM Seat, Movie_Showing WHERE Movie_Showing.RoomNo = roomNo AND Seat.DateTime = dateTime AND Movie_Showing.RoomNo = Seat.Room_No AND Movie_Showing.DateTime = dateTime AND Seat.CustomerID IS NULL;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getOrderNumber` (IN `customerID` INT(11), IN `movieID` INT(11), IN `dateTime` DATETIME(6))  NO SQL
 BEGIN
 SELECT food_order.Order_Number FROM food_order WHERE food_order.CustomerID = customerID AND food_order.MovieID = movieID AND food_order.DateTime = dateTime;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getShowingsInRoom` (IN `room` INT) NO SQL
+BEGIN
+SELECT m.Name "Name", m.Duration "Duration", ms.RoomNo "RoomNo", ms.DateTime "DateTime" 
+FROM movie_showing as ms, movie as m, theatre_room as t
+WHERE t.Room_No = ms.RoomNo and  m.MovieID = ms.MovieID and t.Room_No = room
+ORDER BY DateTime;
+END $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getTheatreLocation` (IN `id` INT) NO SQL
+BEGIN
+SELECT Location FROM cinema_theatre WHERE TheatreID = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getTheatreRooms` (IN `id` INT) NO SQL
+BEGIN
+SELECT Room_No FROM theatre_room WHERE TheatreID= id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `removeMovie` (IN `id` INT) NO SQL
+BEGIN 
+DELETE FROM movie WHERE MovieID = id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `removeMovieShowing` (IN `date` INT, IN `room` INT) NO SQL
+BEGIN 
+DELETE FROM movie_showing WHERE DateTime = date AND RoomNo = room;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `updateBookingCost` (IN `cost` INT(11), IN `customerID` INT(11), IN `movieID` INT(11), IN `dateTime` DATETIME(6), IN `roomNo` INT(11))  NO SQL
@@ -200,82 +292,22 @@ BEGIN
 UPDATE Booking SET booking.Cost = cost, booking.No_of_seats = noOfSeats WHERE booking.CustomerID = customerID AND booking.MovieID = movieID AND booking.DateTime = dateTime AND booking.Room_No = roomNo;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `updateCustomerSeat` (IN `cID` INT(11), IN `sID` INT(11), IN `roomNo` INT(11), IN `dateTime` DATETIME(6))  NO SQL
-BEGIN
-UPDATE Seat SET seat.CustomerID = cID WHERE seat.SeatID = sID AND seat.Room_No = roomNo AND seat.DateTime = dateTime;
-END$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `updateQuantity` (IN `quantity` INT(11), IN `orderNumber` INT(11), IN `customerID` INT(11), IN `foodID` INT(11))  NO SQL
 BEGIN
 UPDATE contains_food_order SET contains_food_order.Quantity = quantity WHERE contains_food_order.Order_Number = orderNumber AND contains_food_order.CustomerID = customerID AND contains_food_order.FoodID = foodID;
 END$$
 
--- Procedures for Employee Login and Employee Pages
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `addEmployeeAccount`(IN `essn` INT, IN `fname` VARCHAR(20), IN `lname` VARCHAR(20), IN `dob` date, IN `address` VARCHAR(50), IN `mssn` INT, IN `theatreid` INT, IN `eemail` VARCHAR(50), IN `epassword` VARCHAR(50)) NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateSeatsCustomer` (IN `customerID` INT(11), IN `seatID` INT(11), IN `roomNo` INT(11), IN `dateTime` DATETIME(6))  NO SQL
+    DETERMINISTIC
 BEGIN
-INSERT INTO Employee (SSN, First_Name, Last_Name, DOB, Address, Mgr_SSN, TheatreID, Email_Address, Password) VALUES 
-(essn, fname, lname, dob, address, mssn, theatreid, eemail, epassword);
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `checkManagerSSN`(IN `mssn` INT) NO SQL
-BEGIN
-SELECT Mgr_SSN FROM Cinema_Theatre WHERE Mgr_SSN = mssn;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getEmployeeInfo`(IN `eemail` VARCHAR(20), IN `epassword` VARCHAR(20)) NO SQL
-BEGIN
-SELECT * FROM Employee WHERE Employee.Email_Address = eemail AND Employee.Password = epassword;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getEmployeeSSN`(IN `eemail` VARCHAR(20), IN `epassword` VARCHAR(20)) NO SQL
-BEGIN
-SELECT SSN FROM Employee WHERE Employee.Email_Address = eemail AND Employee.Password = epassword;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getFoodItemsbyOrderNo`(IN `orderNo` INT) NO SQL
-BEGIN
-SELECT * FROM Contains_Food_Order, Food WHERE Contains_Food_Order.Order_Number = orderNo AND Contains_Food_Order.FoodID = Food.FoodID;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getFoodOrders`(IN `delivered` INT, IN `today` DATETIME, IN `eemail` VARCHAR(50)) NO SQL
-BEGIN
-SELECT DISTINCT Food_Order.Order_Number, Food_Order.DateTime, Seat.Room_No, Food_Order.CustomerID, Food_Order.MovieID, Food_Order.Deliver_Status, Food_Order.ESSN
-From Food_Order, Seat, Theatre_Room, Employee 
-WHERE Deliver_Status <> delivered AND Food_Order.DateTime > today AND Seat.DateTime = Food_Order.DateTime AND Seat.CustomerID = Food_Order.CustomerID AND Seat.Room_No = Theatre_Room.Room_No AND Theatre_Room.TheatreID = Employee.TheatreID AND Employee.Email_Address = eemail
-ORDER BY Food_Order.Deliver_Status DESC, Food_Order.DateTime;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getManagerAndTheatreInfo`(IN `loc` VARCHAR(50)) NO SQL
-BEGIN
-SELECT Mgr_SSN, TheatreID FROM Cinema_Theatre WHERE Location = loc;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `getSeatIDs`(IN `customerid` VARCHAR(50), IN `dt` DATETIME) NO SQL
-BEGIN
-SELECT Seat.SeatID FROM Seat WHERE Seat.CustomerID = customerid AND Seat.DateTime = dt;
-END$$
-
-CREATE DEFINER= `root`@`localhost` PROCEDURE `updateDeliverStatus`(IN `Essn` INT, IN `dstatus` INT, IN `orderNo` INT, IN `customerID` INT, IN `movieID` INT, IN `dt` DATETIME) NO SQL
-BEGIN
-UPDATE Food_Order SET ESSN = Essn, Deliver_Status = dstatus WHERE Order_Number = orderNo AND CustomerID = customerID AND MovieID = movieID AND Food_Order.DateTime = dt;
-END$$
-
--- Procedures for Manager Pages
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addSeatsForShowing` (IN `dt` DATETIME, IN `roomNo` INT)  NO SQL
-BEGIN
-INSERT INTO seat (SeatID, Seat_Type, Room_No, CustomerID, DateTime) VALUES
-('A01', 'Wheelchair', roomNo, NULL, dt),
-('A02', 'Wheelchar', roomNo, NULL, dt),
-('A03', 'Normal', roomNo, NULL, dt),
-('A04', 'Normal', roomNo, NULL, dt),
-('A05', 'Normal', roomNo, NULL, dt);
+UPDATE Seat SET seat.CustomerID = customerID WHERE seat.SeatID = seatID AND seat.Room_No = roomNo AND seat.DateTime = dateTime;
 END$$
 
 DELIMITER ;
 
 -- --------------------------------------------------------
+
+
 /* TABLE STRUCTURES */
 
 -- --------------------------------------------------------
@@ -314,7 +346,8 @@ CREATE TABLE `cinema_theatre` (
 -- populating cinema_theatre table
 
 INSERT INTO `cinema_theatre` (`TheatreID`, `Location`, `Mgr_SSN`) VALUES
-(1, 'Calgary', 1);
+(1, 'Calgary', 1),
+(2, 'Okotoks', 4);
 
 -- --------------------------------------------------------
 
@@ -333,11 +366,11 @@ CREATE TABLE `contains_food_order` (
 
 INSERT INTO `contains_food_order` (`Order_Number`, `CustomerID`, `FoodID`, `Quantity`) VALUES
 (1, 1, 4, 1),
-(1, 1, 10, 1),
-(2, 2, 1, 1),
-(2, 2, 22, 2),
-(3, 3, 3, 2),
-(3, 3, 19, 1);
+(2, 1, 10, 1),
+(3, 2, 1, 1),
+(4, 2, 22, 2),
+(5, 3, 3, 2),
+(6, 3, 19, 1);
 -- --------------------------------------------------------
 
 --
@@ -384,7 +417,9 @@ CREATE TABLE `employee` (
  INSERT INTO employee (SSN, First_Name, Last_Name, DOB, Address, Mgr_SSN, TheatreID, Email_Address, Password) VALUES
  (1, 'Sanchit', 'Kumar', '1929-12-03', '52 Rainbow Road', null, 1, 'sanchitk99@gmail.com', '12345'),
  (2, 'Alliana', 'Dela Pena', '1941-05-24', '52 Rainbow Road', 1, 1, 'allianad@gmail.com', '12345'),
- (3, 'Nika', 'Magadia', '1982-03-12', '52 Rainbow Road', 1, 1, 'nikam@gmail.com', '12345');
+ (3, 'Nika', 'Magadia', '1982-03-12', '52 Rainbow Road', 1, 1, 'nikam@gmail.com', '12345'),
+ (4, 'Ryan', 'Potter', '1990-01-23', '123 Name St', null, 2, 'ryanp@email.com', '12345'),
+ (5, 'Amanda','McKay', '1992-11-11', '12 Another St', 4, 2, 'amandam@email.com', '12345');
 -- --------------------------------------------------------
 
 --
@@ -449,9 +484,12 @@ CREATE TABLE `food_order` (
 -- populating food_order
 
 INSERT INTO `food_order` (`Order_Number`, `CustomerID`, `MovieID`, `DateTime`, `ESSN`, `Deliver_Status`) VALUES
-(1, 1, 1, '2021-12-25 13:30:00', 1, 1),
-(2, 2, 1, '2021-12-25 13:30:00', null, 0),
-(3, 3, 1, '2021-12-25 13:30:00', null, 0);
+(1, 1, 1, '2021-12-25 13:30:00', null, 0),
+(2, 1, 1, '2021-12-25 13:30:00', null, 0),
+(3, 2, 1, '2021-12-25 13:30:00', null, 0),
+(4, 2, 1, '2021-12-25 13:30:00', null, 0),
+(5, 3, 1, '2021-12-25 13:30:00', null, 0),
+(6, 3, 1, '2021-12-25 13:30:00', null, 0);
 
 -- --------------------------------------------------------
 
@@ -489,7 +527,9 @@ CREATE TABLE `movie_showing` (
 --
 
 INSERT INTO `movie_showing` (`DateTime`, `RoomNo`, `MovieID`) VALUES
-('2021-12-25 13:30:00', 2, 1);
+('2021-12-25 13:30:00', 2, 1),
+('2021-12-18 17:30:00', 2, 1),
+('2021-12-18 13:00:00', 2, 1);
 
 -- --------------------------------------------------------
 
@@ -532,7 +572,14 @@ CREATE TABLE `theatre_room` (
 
 INSERT INTO `theatre_room` (`Room_No`, `TheatreID`) VALUES
 (1, 1),
-(2, 1);
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 2),
+(7, 2),
+(8, 2);
+
 
 
 /* ADDING KEYS */
@@ -706,5 +753,7 @@ ALTER TABLE `seat`
 --
 ALTER TABLE `theatre_room`
   ADD CONSTRAINT `TheatreRoom_TheatreID_FK` FOREIGN KEY (`TheatreID`) REFERENCES `cinema_theatre` (`TheatreID`) ON DELETE RESTRICT;
+
+
 
   
