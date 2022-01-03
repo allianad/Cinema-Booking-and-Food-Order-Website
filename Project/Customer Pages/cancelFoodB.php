@@ -49,7 +49,7 @@ $con->next_result();
 //Get the order_number of the food that the customer has ordered for this movie showing
 $stmt3 = $con->prepare('CALL getOrderNumber(?, ?, ?)');
 
-$stmt3-> bind_param('sss', $customerID, $movieID, $dateTime);  
+$stmt3-> bind_param('sss', $customerID, $roomNo, $dateTime);  
 
 $stmt3->execute();
 
@@ -120,7 +120,7 @@ $con->next_result();
 //Delete the food order for this customer for this movie showing
 $stmt8 = $con->prepare('CALL deleteCustomerFoodOrder(?, ?, ?, ?)');
 	
-$stmt8->bind_param('ssss', $orderNumber, $customerID, $movieID, $dateTime);
+$stmt8->bind_param('ssss', $orderNumber, $customerID, $roomNo, $dateTime);
 	
 $stmt8->execute();
 

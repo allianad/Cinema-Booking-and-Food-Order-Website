@@ -22,12 +22,24 @@ $rows = $stmt->rowCount();
 
 if($rows > 0){
 	$result = $stmt->fetch(PDO::FETCH_ASSOC);
-	echo " Email: ". $result['Email_Address']. "\n";
-    echo " Fname: ". $result['First_Name']. "\n";
-    echo " Lname ". $result['Last_Name']. "\n";
-    echo " Date of Birth: ". $result['DOB']. "\n";
-    echo " Address: ". $result['Address']. "\n";
-    echo " TheatreID: ". $result['TheatreID']. "\n";
+	echo " SSN: ". $result['SSN']. "\n";
+
+    //Checking if ssn matches a manager ssn in the database
+	$stmt = $con->prepare('CALL checkManagerSSN(?)');
+	
+	$stmt->bindParam(1, $result['SSN'], PDO::PARAM_STR, 20);
+	
+	$stmt->execute();
+
+	$rows = $stmt->rowCount();
+	
+	if($rows == 0){
+		echo "Employee Account";
+	}
+	
+	else{
+		echo "Manager Account";
+	}
 }
 
 else{

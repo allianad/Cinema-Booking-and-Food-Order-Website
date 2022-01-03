@@ -144,7 +144,7 @@ session_start();
                                 <input type='submit' value='Update'>
                                 <input type='hidden' name='OrderNo' value='".$row['Order_Number']."'>
                                 <input type='hidden' name='CustomerID' value='".$row['CustomerID']."'>
-                                <input type='hidden' name='MovieID' value='".$row['MovieID']."'>
+                                <input type='hidden' name='RoomNo' value='".$row['Room_No']."'>
                                 <input type='hidden' name='DateTime' value='".$row['DateTime']."'>
                             </form>
                         </td>

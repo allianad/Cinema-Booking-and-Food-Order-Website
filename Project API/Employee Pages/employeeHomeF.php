@@ -87,9 +87,19 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
     }
 
     extract($row);
+
+    if($Deliver_Status == 0){
+        $ds = 'Order Placed';
+    }
+    else if($Deliver_Status == 1){
+        $ds = 'In Progress';
+    }
+    else {
+        $ds = 'Delivered';
+    }
     $ex = array(
         "Order Number" => $Order_Number,
-        "Deliver Status" => $Deliver_Status,
+        "Deliver Status" => $ds,
         "Date Time" => $DateTime,
         "Room Number" => $Room_No,
         "Seat" => $seatArray,

@@ -57,7 +57,7 @@ while($row2 = mysqli_fetch_array($result2)){
 //Check if the customer has already bought food for this movie showing
 $stmt3 = $con->prepare('CALL getOrderNumber(?, ?, ?)');
 
-$stmt3-> bind_param('sss', $customerID, $movieID, $dateTime);  
+$stmt3-> bind_param('sss', $customerID, $roomNo, $dateTime);  
 
 $stmt3->execute();
 
@@ -78,7 +78,7 @@ else{
 	//Create a new food order for this movie showing
 	$stmt4 = $con->prepare('CALL createFoodOrder(?, ?, ?)');
 
-	$stmt4-> bind_param('sss', $customerID, $movieID, $dateTime);  
+	$stmt4-> bind_param('sss', $customerID, $roomNo, $dateTime);  
 
 	$stmt4->execute();
 	
@@ -87,7 +87,7 @@ else{
 	//Get the order number for this newly created food order
 	$stmt5 = $con->prepare('CALL getOrderNumber(?, ?, ?)');
 
-	$stmt5-> bind_param('sss', $customerID, $movieID, $dateTime);  
+	$stmt5-> bind_param('sss', $customerID, $roomNo, $dateTime);  
 
 	$stmt5->execute();
 

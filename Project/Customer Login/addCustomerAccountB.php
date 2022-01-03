@@ -1,4 +1,6 @@
 <?php 
+session_start();
+
 include_once '../Database/connection.php';
 
 $_SESSION["customerE-mail"] = $_POST["E-mail"];

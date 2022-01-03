@@ -11,7 +11,7 @@ $con = getConnection();
 $email = isset($_GET['Email']) ? $_GET['Email'] : die();
 $password = isset($_GET['Password']) ? $_GET['Password'] : die();
 
-$stmt = $con->prepare('CALL checkCustomerAccount(?, ?)');
+$stmt = $con->prepare('CALL getCustomerInfo(?, ?)');
 
 $stmt->bindParam(1, $email, PDO::PARAM_STR, 20);
 $stmt->bindParam(2, $password, PDO::PARAM_STR, 20);
@@ -22,7 +22,10 @@ $rows = $stmt->rowCount();
 
 if($rows > 0){
 	$result = $stmt->fetch(PDO::FETCH_ASSOC);
-	echo " Customer ID: ". $result['CustomerID'];
+
+	echo "First Name: ". $result['FirstName']. " ";
+	echo "Last Name: ". $result['LastName']. " ";
+	echo "Email: ". $result['Email']. " ";
 }
 
 else{

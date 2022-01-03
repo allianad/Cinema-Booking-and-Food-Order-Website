@@ -38,7 +38,7 @@ session_start();
 			$con = getConnection();
 			
 			//Get all customer information
-			$stmt = $con->prepare('SELECT * FROM Customer WHERE Email = ? AND Password = ?');
+			$stmt = $con->prepare('CALL getCustomerInfo(?, ?)');
 			
 			//Get the email and password of this customer
 			$email = $_SESSION["customerE-mail"];
@@ -49,14 +49,18 @@ session_start();
 			$stmt->execute();
 
 			$result = $stmt->get_result();
-			
-			$value = $result->fetch_object();
+				
+			//Set the customer ID
+			while($row = mysqli_fetch_array($result)){
+				$firstName = $row['FirstName'];
+				$lastName = $row['LastName'];
+			}
 			
 			//Display the first name, last name, and email of this customer
 			echo "<ul class='info'>";
 			
-			echo "<li>First Name: ". $value->FirstName . "</li>";
-			echo "<li>Last Name: ". $value->LastName . "</li>";
+			echo "<li>First Name: ". $firstName . "</li>";
+			echo "<li>Last Name: ". $lastName . "</li>";
 			echo "<li>E-mail: ". $_SESSION["customerE-mail"]. "</li>";
 			
 			echo "</ul>";
@@ -86,13 +90,9 @@ session_start();
 			
 			<!-- Use PHP to get table data -->
 			<?php
-				// Create connection
-				$con=mysqli_connect("localhost","root","Sanchit2001!","cpsc471_project");
-
-				// Check connection
-				if (mysqli_connect_errno($con)){
-					echo "Failed to connect to MySQL: " . mysqli_connect_error();
-				}
+				include_once '../Database/connection.php';
+			
+				$con = getConnection();
 				
 				//Get the email and password of the customer
 				$email = $_SESSION["customerE-mail"];
@@ -141,7 +141,7 @@ session_start();
 					//Get all food ordered for this movie showing by this customer
 					$stmt4 = $con->prepare('CALL getCustomerFood(?, ?, ?)');
 						
-					$stmt4-> bind_param('sss', $customerID, $row2['MovieID'], $row2['DateTime']);
+					$stmt4-> bind_param('sss', $customerID, $row2['Room_No'], $row2['DateTime']);
 				
 					$stmt4->execute();
 				

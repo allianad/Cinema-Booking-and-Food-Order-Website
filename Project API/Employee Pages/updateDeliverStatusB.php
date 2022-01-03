@@ -15,7 +15,7 @@ $email =$data->Email;
 $password = $data->Password;
 $orderNo = $data->OrderNo;
 $customerID = $data->CustomerID;
-$movieID = $data->MovieID;
+$roomNo = $data->RoomNo;
 $dateTime = $data->DateTime;
 $deliverStatus = $data->DeliverStatus;
 
@@ -54,7 +54,7 @@ $stmt2 = $updateCon->prepare('CALL updateDeliverStatus(?, ?, ?, ?, ?, ?)');
 
 $stmt2->bindParam(3, $orderNo, PDO::PARAM_STR, 11);
 $stmt2->bindParam(4, $customerID, PDO::PARAM_STR, 11);
-$stmt2->bindParam(5, $movieID, PDO::PARAM_STR, 11);
+$stmt2->bindParam(5, $roomNo, PDO::PARAM_STR, 11);
 $stmt2->bindParam(6, $dateTime, PDO::PARAM_STR, 50);
 
 $stmt2->execute();
@@ -71,19 +71,22 @@ $stmt->bindParam(3, $email, PDO::PARAM_STR, 20);
 $stmt->execute();
 
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-    echo "Order Number: ". $row['Order_Number']."\n";
-    echo "ESSN: ". $row['ESSN']."\n";
+	//Output only the updated food order
+	if($orderNo == $row['Order_Number']){
+		echo "Edited this order in the database.\n";
+		echo "Order Number: ". $row['Order_Number']."\n";
+		echo "ESSN: ". $row['ESSN']."\n";
 
-	if($row['Deliver_Status'] == 1){
-		echo "Deliver Status: In Progress\n\n\n";
-	}
-	else if($row['Deliver_Status'] == 2){
-		echo "Deliver Status: Delivered\n\n\n";
-	}
-	else{
-		echo "Deliver Status: Order Placed\n\n\n";
-	}
-    
+		if($row['Deliver_Status'] == 1){
+			echo "Deliver Status: In Progress\n\n\n";
+		}
+		else if($row['Deliver_Status'] == 2){
+			echo "Deliver Status: Delivered\n\n\n";
+		}
+		else{
+			echo "Deliver Status: Order Placed\n\n\n";
+		}
+	}  
 }
 
 ?>

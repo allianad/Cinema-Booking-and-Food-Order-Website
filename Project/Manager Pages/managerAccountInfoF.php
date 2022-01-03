@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <html>
 
 <header>
@@ -20,13 +24,58 @@
     </nav>
 	<h1>Manager Account</h1>
 	<div>
-		<ul class="info">
-            <li>First Name: </li>
-            <li>Last Name: </li>
-            <li>Birthdate: </li>
-            <li>Address: </li>
-            <li>Theatre Location: </li>
-        </ul>
+        <?php
+			include_once '../Database/connection.php';
+
+			// Create connection
+    		$con = getConnection();
+			
+			//Get all manager information
+			$stmt = $con->prepare('SELECT * FROM Employee WHERE Email_Address = ? AND Password = ?');
+			
+			//Get the email and password of this manager
+			$email = $_SESSION["employeeE-mail"];
+			$password = $_SESSION["employeePassword"];
+
+			$stmt-> bind_param('ss', $email, $password);  
+
+			$stmt->execute();
+
+			$result = $stmt->get_result();
+			
+			$value = $result->fetch_object();
+			
+			//Display the manager's information
+			echo "<ul class='info'>";
+			
+			echo "<li>First Name: ". $value->First_Name . "</li>";
+			echo "<li>Last Name: ". $value->Last_Name . "</li>";
+			echo "<li>E-mail: ". $_SESSION["employeeE-mail"]. "</li>";
+			echo "<li>Birthdate: ". $value->DOB . "</li>";
+            echo "<li>Address: ". $value->Address . "</li>";
+
+			$_SESSION["managerTheatreID"] = $value->TheatreID;
+            
+            // getting the theatre information
+            $stmt = $con->prepare('CALL getTheatreLocation (?)');
+			$stmt-> bind_param('i', $value->TheatreID);  
+
+			$stmt->execute();
+
+			$result = $stmt->get_result();
+			
+			$value = $result->fetch_object();
+            echo "<li>Theatre Location: ". $value->Location . "</li>";
+
+			$_SESSION["managerLocation"] = $value->Location;
+
+            echo "</ul>";
+		
+		?>
 	</div>
 </body>
 </html>
+
+
+
+

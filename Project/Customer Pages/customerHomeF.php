@@ -52,7 +52,7 @@ session_start();
 				//Get Information of movie showings occurring in the future (Movie name, genre, duration, date and time, and location)
 				$stmt = $con->prepare('CALL getAvailableMovieShowings(?)');
 				
-				$stmt-> bind_param('s', date('Y-m-d'));
+				$stmt-> bind_param('s', date('Y-m-d H:i:s'));
 				
 				$stmt->execute();
 				

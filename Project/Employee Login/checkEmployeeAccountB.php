@@ -46,7 +46,8 @@ if($result->num_rows > 0){
 	}
 	
 	else{
-		header("Location: ../Manager Pages/managerHomeF.php");
+		//header("Location: ../Manager Pages/editMovieShowingF.php");
+		header("Location: ../Manager Pages/managerAccountInfoF.php");
 		mysqli_close($con);
 		exit();
 	}

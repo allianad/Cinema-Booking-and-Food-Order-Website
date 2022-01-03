@@ -8,7 +8,7 @@
 	//Get order number, customer id, movie id and date and time from the submitted form
 	$orderNo = $_POST['OrderNo'];
 	$customerID = $_POST['CustomerID'];
-	$movieID = $_POST['MovieID'];
+	$roomNo = $_POST['RoomNo'];
 	$dateTime = $_POST['DateTime'];
 	$deliverStatus = $_POST['deliverStatus'];
 
@@ -38,16 +38,16 @@
 	//Set deliver status according to what employee set it as
 	if($deliverStatus == 'inProgress'){
 		$inProgress = 1;
-		$stmt2-> bind_param('ssssss', $ESSN, $inProgress, $orderNo, $customerID, $movieID, $dateTime); 
+		$stmt2-> bind_param('ssssss', $ESSN, $inProgress, $orderNo, $customerID, $roomNo, $dateTime); 
 	}
 	else if($deliverStatus == 'delivered'){
 		$delivered = 2;
-		$stmt2-> bind_param('ssssss', $ESSN, $delivered, $orderNo, $customerID, $movieID, $dateTime); 
+		$stmt2-> bind_param('ssssss', $ESSN, $delivered, $orderNo, $customerID, $roomNo, $dateTime); 
 	}
 	else{
 		$orderPlaced = 0;
 		$null = NULL;
-		$stmt2-> bind_param('ssssss', $null, $orderPlaced, $orderNo, $customerID, $movieID, $dateTime); 
+		$stmt2-> bind_param('ssssss', $null, $orderPlaced, $orderNo, $customerID, $roomNo, $dateTime); 
 	}
 
 	$stmt2->execute();
